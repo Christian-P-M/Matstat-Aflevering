@@ -1,0 +1,35 @@
+---
+title: "Aflevering"
+author: "Christian Præst Møller"
+date: "2026-05-11"
+output: html_document
+---
+Opgave 4
+```{r}
+n <- 100000
+u <- runif(n,0,1)
+lambda <- 0.01
+eta <- 0.05
+beta <- 0.1
+xo <- 5
+svar <- numeric(n)
+hthxo <- lambda*xo+eta*(exp(beta*xo)-1)
+
+for(i in (1:n)) {
+  lign <- function(x)  {
+  lambda*x+eta*(exp(beta*x)-1)-(lambda*xo+eta*(exp(beta*xo)-1))+log(1-u[i])}
+  svar[i] <- uniroot(function(x) lign(x), lower = -1, upper = 100, tol = 1e-9)$root
+}
+svar
+
+ford <- function(x) (lambda+eta*beta*exp(beta*x))*exp(-(lambda*x+eta*(exp(beta*x)-1)))
+
+hist(svar,probability=TRUE)
+curve(ford, add=TRUE)
+```
+```{r}
+l <- function(x) log((lambda+eta*beta*exp(beta*x))*exp(-(lambda*x+eta*(exp(beta*x)-1))))
+score <- c(((eta*beta*x*exp(beta*x)+eta*exp(beta*x))/(lambda+eta*beta*exp(beta*x)))-eta*x*exp(beta*x)+eta*beta*xo*exp(beta*xo), ((beta*exp(beta*x))/(lambda+eta*beta*exp(beta*x)))-(exp(beta*x)-exp(beta*xo)),
+           (1/(lambda+eta*beta*exp(beta*x)))-(x-x0)
+```
+
