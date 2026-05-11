@@ -6,7 +6,7 @@ output: html_document
 ---
 Opgave 4
 ```{r}
-n <- 100000
+n <- 500000
 u <- runif(n,0,1)
 lambda <- 0.01
 eta <- 0.05
@@ -27,9 +27,44 @@ ford <- function(x) (lambda+eta*beta*exp(beta*x))*exp(-(lambda*x+eta*(exp(beta*x
 hist(svar,probability=TRUE)
 curve(ford, add=TRUE)
 ```
+
+Score
 ```{r}
 l <- function(x) log((lambda+eta*beta*exp(beta*x))*exp(-(lambda*x+eta*(exp(beta*x)-1))))
-score <- c(((eta*beta*x*exp(beta*x)+eta*exp(beta*x))/(lambda+eta*beta*exp(beta*x)))-eta*x*exp(beta*x)+eta*beta*xo*exp(beta*xo), ((beta*exp(beta*x))/(lambda+eta*beta*exp(beta*x)))-(exp(beta*x)-exp(beta*xo)),
-           (1/(lambda+eta*beta*exp(beta*x)))-(x-x0)
+score <-function(x) c(((eta*beta*x*exp(beta*x)+eta*exp(beta*x))/(lambda+eta*beta*exp(beta*x)))-eta*x*exp(beta*x)+eta*beta*xo*exp(beta*xo), ((beta*exp(beta*x))/(lambda+eta*beta*exp(beta*x)))-(exp(beta*x)-exp(beta*xo)),
+           (1/(lambda+eta*beta*exp(beta*x)))-(x-xo))
+test <- score(svar)
+mean(test[seq(1, length(test), by = 3)])
+mean(test[seq(2, length(test), by = 3)])
+mean(test[seq(3, length(test), by = 3)])
+
+
+```
+Information
+```{r}
+Info <- function(x) c(((-(2*eta*x*exp(beta*x)+eta*beta*x**2*exp(beta*x)))/(lambda+eta*beta*exp(beta*x)))+(((eta*beta*x*exp(beta*x)+eta*exp(beta*x))**2)/((lambda+eta*beta*exp(beta*x))**2))+eta*(x^2)*exp(beta*x)-eta*xo**2*exp(beta*xo),
+((-(beta*x*exp(beta*x)+exp(beta*x))*(lambda/(eta**2)))/(((lambda/eta)+beta*exp(beta*x))**2))+(x*exp(beta*x))-(xo*exp(beta*xo)),
+(eta*beta*x*exp(beta*x)+eta*exp(beta*x))/((lambda+eta*beta*exp(beta*x))**2),
+((beta*exp(beta*x))**2)/((lambda+eta*beta*exp(beta*x))**2),
+(beta*exp(beta*x))/((lambda+eta*beta*exp(beta*x))**2),
+1/((lambda+eta*beta*exp(beta*x))**2))
+
+hehe<- Info(svar)
+mean(hehe[seq(1, length(hehe), by = 6)])
+mean(hehe[seq(2, length(hehe), by = 6)])
+mean(hehe[seq(3, length(hehe), by = 6)])
+mean(hehe[seq(4, length(hehe), by = 6)])
+mean(hehe[seq(5, length(hehe), by = 6)])
+mean(hehe[seq(6, length(hehe), by = 6)])
+```
+vn
+```{r}
+mean(test[seq(1, length(test), by = 3)]*test[seq(1, length(test), by = 3)])
+mean(test[seq(2, length(test), by = 3)]*test[seq(1, length(test), by = 3)])
+mean(test[seq(3, length(test), by = 3)]*test[seq(1, length(test), by = 3)])
+mean(test[seq(2, length(test), by = 3)]*test[seq (2, length(test), by = 3)])
+mean(test[seq(2, length(test), by = 3)]*test[seq(3, length(test), by = 3)])
+mean(test[seq(3, length(test), by = 3)]*test[seq(3, length(test), by = 3)])
 ```
 
+Skal teste om det påvirker middelværdierne at dele functionerne op. Burde det ikke men man ved aldrig.
