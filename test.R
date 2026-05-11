@@ -27,7 +27,7 @@ hist(Alder,breaks=20,probability=TRUE) #Histogram
 curve(ff,lwd=2,add=TRUE) #Plot af tætheden
 
 
-
+x
 
 
 #2. plot
