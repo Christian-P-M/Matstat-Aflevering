@@ -116,12 +116,12 @@ curve(ff,lwd=2,add=TRUE) #Plot af tætheden
 
 
 #Opgave 10
-beta <- 0.07
-eta <- 0.01
-lambda <- 0.003
+beta <- 0.05
+eta <- 0.02
+lambda <- 0.002
 x0 <- 20
 
-MLE <- function(x, x0) {
+MLE <- function(x) {
   nlx <- function(theta) {
     b <- exp(theta[1])
     e <- exp(theta[2])
@@ -134,40 +134,13 @@ MLE <- function(x, x0) {
     -sum(loglik)
   }
   
-  start <- log(c(0.07, 0.008, 0.003))
+  start <- log(c(0.05, 0.02, 0.001))
   optim(start, nlx, method="BFGS")
 }
 
-res <- MLE(Alder, x0)
+res <- MLE(Alder)
 exp(res$par)
 
-
-
-#Plot
-loglik_fun <- function(beta, eta, lambda, x, x0) {
-  log(lambda + eta * beta * exp(beta * x)) -
-    lambda * (x - x0) -
-    eta * (exp(beta * x) - exp(beta * x0))
-}
-beta_seq <- seq(0.05, 0.15, length.out = 50)
-eta_seq  <- seq(0.02, 0.08, length.out = 50)
-
-LL <- matrix(0, length(beta_seq), length(eta_seq))
-
-for (i in 1:length(beta_seq)) {
-  for (j in 1:length(eta_seq)) {
-    LL[i, j] <- sum(
-      loglik_fun(beta_seq[i], eta_seq[j], lambda = 0.01, x = Alder, x0 = x0)
-    )
-  }
-}
-contour(beta_seq, eta_seq, LL,
-        xlab = "beta", ylab = "eta",
-        main = "Log-likelihood overflade")
-persp(beta_seq, eta_seq, LL,
-      theta = 40, phi = 30,
-      xlab = "beta", ylab = "eta", zlab = "log-likelihood",
-      main = "3D log-likelihood overflade")
 
 
 
@@ -201,5 +174,83 @@ weighted.mean(Mænd$Age, Mænd$nx)
 
 Kvinder <- subset(kohorte1910, Sex == "Female")
 weighted.mean(Kvinder$Age, Kvinder$nx)
+
+
+#Opgave 14
+#De gennemsnitlige levealdre for mænd og kvinder
+Mænd <- subset(kohorte1910, Sex == "Male" & Age >= 20)
+weighted.mean(Mænd$Age, Mænd$nx)
+
+Kvinder <- subset(kohorte1910, Sex == "Female" & Age >= 20)
+weighted.mean(Kvinder$Age, Kvinder$nx)
+
+vm <- rep(Mænd$Age, Mænd$nx)
+vk <- rep(Kvinder$Age, Kvinder$nx)
+
+# Mænd c(0.07, 0.02, 0.002) --------------------------------------------------------------------
+MLE <- function(x, x0) {
+  nlx <- function(theta) {
+    b <- exp(theta[1])
+    e <- exp(theta[2])
+    l <- exp(theta[3])
+    
+    loglik <- log(l + e*b*exp(b*x)) -
+      l*(x - x0) -
+      e*(exp(b*x) - exp(b*x0))
+    
+    -sum(loglik)
+  }
+  
+  start <- log(c(0.07, 0.02, 0.002))
+  optim(start, nlx, method="BFGS")
+}
+res <- MLE(vm, x0)
+exp(res$par)
+
+beta <- 0.0932572278
+eta <- 0.0006048876
+lambda <- 0.0012394866
+
+#Tæthed herunder
+ff <- function(x) (lambda+beta*eta*exp(beta*x))*exp(lambda*x0+eta*(exp(beta*x0)-1)-(lambda*x+eta*(exp(beta*x)-1)))
+
+hist(vm,breaks=20,probability=TRUE) #Histogram
+curve(ff,lwd=2,add=TRUE) #Plot af tætheden
+
+# Kvinder c(0.08, 0.002, 0.003) --------------------------------------------------------------------
+MLE <- function(x, x0) {
+  nlx <- function(theta) {
+    b <- exp(theta[1])
+    e <- exp(theta[2])
+    l <- exp(theta[3])
+    
+    loglik <- log(l + e*b*exp(b*x)) -
+      l*(x - x0) -
+      e*(exp(b*x) - exp(b*x0))
+    
+    -sum(loglik)
+  }
+  
+  start <- log(c(0.08, 0.002, 0.003))
+  optim(start, nlx, method="BFGS")
+}
+res <- MLE(vk, x0)
+exp(res$par)
+
+beta <- 0.1053773623
+eta <- 0.0001206993
+lambda <- 0.0019034375
+
+#Tæthed herunder
+ff <- function(x) (lambda+beta*eta*exp(beta*x))*exp(lambda*x0+eta*(exp(beta*x0)-1)-(lambda*x+eta*(exp(beta*x)-1)))
+
+hist(vk,breaks=20,probability=TRUE) #Histogram
+curve(ff,lwd=2,add=TRUE) #Plot af tætheden
+
+
+#Opgave 15
+
+
+
 
 
