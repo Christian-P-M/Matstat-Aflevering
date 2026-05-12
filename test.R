@@ -1,11 +1,11 @@
 #Opgave 4
-set.seed(11)
+set.seed(20)
 U <-runif(10000)
 
 ?uniroot
-beta <- 0.1
-lambda <- 0.01
-eta <- 0.05
+beta <- 0.07
+lambda <- 0.003
+eta <- 0.01
 x0 <- 20
 f <- function (x) lambda*x+eta*(exp(beta*x)-1)-(lambda*x0+eta*(exp(beta*x0)-1))+log(1-U[1])
 uniroot(f, c(20,100))
@@ -14,8 +14,8 @@ uniroot(f, c(20,100))
 Alder <- c()
 for (i in 1:10000) {
   f <- function (x) lambda*x+eta*(exp(beta*x)-1)-(lambda*x0+eta*(exp(beta*x0)-1))+log(1-U[i])
-  uniroot(f, c(20,100))
-  Alder[i] <- uniroot(f, c(20,100))$root
+  uniroot(f, c(20,200))
+  Alder[i] <- uniroot(f, c(20,200))$root
 }
 Alder
 
@@ -116,38 +116,58 @@ curve(ff,lwd=2,add=TRUE) #Plot af tætheden
 
 
 #Opgave 10
-beta <- 0.1
-lambda <- 0.01
-eta <- 0.05
+beta <- 0.07
+eta <- 0.01
+lambda <- 0.003
 x0 <- 20
-f <- function (x) lambda*x+eta*(exp(beta*x)-1)-(lambda*x0+eta*(exp(beta*x0)-1))+log(1-U[1])
-uniroot(f, c(20,100))
 
-
-Alder <- c()
-for (i in 1:10000) {
-  f <- function (x) lambda*x+eta*(exp(beta*x)-1)-(lambda*x0+eta*(exp(beta*x0)-1))+log(1-U[i])
-  uniroot(f, c(20,100))
-  Alder[i] <- uniroot(f, c(20,100))$root
-}
-Værdi
-
-MLE <- function(x) {
-  nlx <- function(par) {
-    b <- par[1]
-    e <- par[2]
-    l <- par[3]
-    loglik <- log(l+e*b*exp(b*x))-l*(x-x0)-e*(exp(b*x)-exp(b*x0))
+MLE <- function(x, x0) {
+  nlx <- function(theta) {
+    b <- exp(theta[1])
+    e <- exp(theta[2])
+    l <- exp(theta[3])
+    
+    loglik <- log(l + e*b*exp(b*x)) -
+      l*(x - x0) -
+      e*(exp(b*x) - exp(b*x0))
+    
     -sum(loglik)
   }
-  optim(c(0.11,0.051,0.011), nlx,method ="L-BFGS-B",lower=c(exp(-8),exp(-8),exp(-8)))
+  
+  start <- log(c(0.07, 0.008, 0.003))
+  optim(start, nlx, method="BFGS")
 }
 
-MLE(Værdi)
-Alder
+res <- MLE(Alder, x0)
+exp(res$par)
 
-?optim
 
+
+#Plot
+loglik_fun <- function(beta, eta, lambda, x, x0) {
+  log(lambda + eta * beta * exp(beta * x)) -
+    lambda * (x - x0) -
+    eta * (exp(beta * x) - exp(beta * x0))
+}
+beta_seq <- seq(0.05, 0.15, length.out = 50)
+eta_seq  <- seq(0.02, 0.08, length.out = 50)
+
+LL <- matrix(0, length(beta_seq), length(eta_seq))
+
+for (i in 1:length(beta_seq)) {
+  for (j in 1:length(eta_seq)) {
+    LL[i, j] <- sum(
+      loglik_fun(beta_seq[i], eta_seq[j], lambda = 0.01, x = Alder, x0 = x0)
+    )
+  }
+}
+contour(beta_seq, eta_seq, LL,
+        xlab = "beta", ylab = "eta",
+        main = "Log-likelihood overflade")
+persp(beta_seq, eta_seq, LL,
+      theta = 40, phi = 30,
+      xlab = "beta", ylab = "eta", zlab = "log-likelihood",
+      main = "3D log-likelihood overflade")
 
 
 
